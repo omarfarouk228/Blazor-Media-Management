@@ -1,0 +1,108 @@
+@page "/medias"
+@attribute [StreamRendering]
+@using BlazorSuperApp.Dtos
+@inject BlazorSuperApp.Services.MediaService MediaService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<PageTitle>Liste de médias</PageTitle>
+
+<h1>Liste de médias</h1>
+
+<button class="btn btn-secondary float-end" @onclick="AddMedia">Ajouter un média</button>
+
+@if (medias == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!medias.Any())
+{
+    <p><em>No medias found.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <td></td>
+                <td>ID</td>
+                <td>Nom</td>
+                <td>Type</td>
+                <td>Status</td>
+                <td>Groupe</td>
+                <td>Actions</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var media in medias)
+            {
+                <tr>
+                    <td>
+                        <a href="@GetMediaUrl(media.Path)" target="_blank">
+                            <img src="@GetMediaUrl(media.Path)" alt="@GetMediaUrl(media.Path)" class="img-thumbnail img-size" />
+                        </a>
+                    </td>
+                    <td>@media.ID</td>
+                    <td>@media.Name</td>
+                    <td>@media.Type</td>
+                    <td>@media.Status</td>
+                    <td>@media.GroupID</td>
+                    <td>
+                        <button class="btn btn-info text-white" @onclick="() => EditMedia(media.ID)">Editer</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteMedia(media.ID)">Supprimer</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<MediaDto>? medias;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            medias = await MediaService.GetAll();
+            StateHasChanged();
+        }
+    }
+
+
+    void AddMedia()
+    {
+        NavigationManager.NavigateTo("/medias/create");
+    }
+
+    void ViewMedia(int id)
+    {
+        NavigationManager.NavigateTo("/medias/show/" + id);
+    }
+
+    void EditMedia(int id)
+    {
+        NavigationManager.NavigateTo("/medias/edit/" + id);
+    }
+
+    async Task DeleteMedia(int id)
+    {
+        bool confirm = await JS.InvokeAsync<bool>("confirm", "Êtes-vous sûr de vouloir supprimer ce mediae ?");
+        if (confirm)
+        {
+            await MediaService.Delete(id);
+            medias = await MediaService.GetAll();
+            StateHasChanged();
+        }
+    }
+
+    private string GetMediaUrl(string? mediaPath)
+    {
+        if (mediaPath == null) return "https://webemps.com/images/default-image.jpg";
+
+        return $"http://localhost:5178/{mediaPath.TrimStart('/')}";
+    }
+
+
+}

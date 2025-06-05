@@ -1,0 +1,87 @@
+@page "/medias/create"
+@using BlazorSuperApp.Dtos
+@using BlazorSuperApp.Models
+@inject BlazorSuperApp.Services.MediaService MediaService
+@inject BlazorSuperApp.Services.GroupService GroupService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Ajouter un média</PageTitle>
+
+<h1>Ajouter un média</h1>
+
+<EditForm Model="media" OnValidSubmit="AddValidSubmit" FormName="addMediaForm">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="name">Nom</label>
+        <InputText id="name" class="form-control" @bind-Value="media.Name" placeholder="Media 3" />
+        <ValidationMessage For="@(() => media.Name)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="groupId">Groupe</label>
+        <InputSelect id="groupId" class="form-select" @bind-Value="media.GroupID">
+            <option value="">-- Choisir un groupe --</option>
+            @foreach (var group in groups)
+            {
+                <option value="@group.ID">@group.Name</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => media.GroupID)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="type">Type</label>
+        <InputSelect id="type" class="form-select" @bind-Value="media.Type">
+            <option value="">-- Choisir un type --</option>
+            <option value="Image">Image</option>
+            <option value="Video">Video</option>
+            <option value="Audio">Audio</option>
+            <option value="Document">Document</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => media.Type)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="file">Fichier</label>
+        <InputFile id="file" class="form-control" OnChange="HandleFileSelected" />
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">Créer</button>
+    </div>
+</EditForm>
+
+@code {
+    private MediaFormModel media = new();
+
+    private List<GroupDto> groups = [];
+
+    private IBrowserFile? selectedFile;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            groups = await GroupService.GetAll();
+            StateHasChanged();
+        }
+    }
+
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    private async Task AddValidSubmit()
+    {
+        if (selectedFile != null)
+        {
+            var result = await MediaService.Create(media, selectedFile);
+            NavigationManager.NavigateTo("/medias");
+        }
+    }
+}

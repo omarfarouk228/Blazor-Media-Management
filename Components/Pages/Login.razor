@@ -1,0 +1,50 @@
+@page "/"
+@layout Layout.LoginLayout
+@inject NavigationManager NavigationManager
+@using BlazorSuperApp.Models;
+@using System.ComponentModel.DataAnnotations;
+@inject BlazorSuperApp.Services.AuthService AuthService
+@rendermode InteractiveServer
+
+<EditForm Model="loginModel" OnValidSubmit="HandleValidSubmit" FormName="loginForm">
+    <DataAnnotationsValidator />
+    <h2 class="text-center mb-5">Connectez-vous</h2>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+
+    <div class="mb-3">
+        <label for="email">Email</label>
+        <InputText id="email" type="email" class="form-control" @bind-Value="loginModel.Email"
+            placeholder="john@gmail.com" />
+        <ValidationMessage For="@(() => loginModel.Email)" />
+    </div>
+    <div class="mb-3">
+        <label for="password">Password</label>
+        <InputText type="password" id="password" class="form-control" @bind-Value="loginModel.Password"
+            placeholder="*******" />
+        <ValidationMessage For="@(() => loginModel.Password)" />
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">Login</button>
+    </div>
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new();
+
+    private String? errorMessage;
+
+    private async Task HandleValidSubmit()
+    {
+        errorMessage = await AuthService.Login(loginModel);
+
+        if (errorMessage is null)
+        {
+            NavigationManager.NavigateTo("/home");
+        }
+
+    }
+}

@@ -1,0 +1,102 @@
+﻿@page "/groups"
+@attribute [StreamRendering]
+@using BlazorSuperApp.Dtos
+@using Blazored.LocalStorage
+@inject ILocalStorageService LocalStorage
+@inject BlazorSuperApp.Services.GroupService GroupService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<PageTitle>Liste de groupes</PageTitle>
+
+<h1>Liste de groupes</h1>
+
+<button class="btn btn-secondary float-end" @onclick="AddGroup">Ajouter un groupe</button>
+
+@if (groups == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!groups.Any())
+{
+    <p><em>No groups found.</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Nom</td>
+                <td>Actions</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var group in groups)
+            {
+                <tr>
+                    <td>@group.ID</td>
+                    <td>@group.Name</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => ViewGroup(group.ID)">Voir</button>
+                        <button class="btn btn-info text-white" @onclick="() => EditGroup(group.ID)">Editer</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteGroup(group.ID)">Supprimer</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<GroupDto>? groups;
+
+    private bool _isInitialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            groups = await GroupService.GetAll();
+            _isInitialized = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        groups = await GroupService.GetAll();
+    }
+
+    void AddGroup()
+    {
+        NavigationManager.NavigateTo("/groups/create");
+    }
+
+    void ViewGroup(int id)
+    {
+        NavigationManager.NavigateTo("/groups/show/" + id);
+    }
+
+    void EditGroup(int id)
+    {
+        NavigationManager.NavigateTo("/groups/edit/" + id);
+    }
+
+    async Task DeleteGroup(int id)
+    {
+        if (!_isInitialized) return;
+
+        bool confirm = await JS.InvokeAsync<bool>("confirm", "Êtes-vous sûr de vouloir supprimer ce groupe ?");
+        if (confirm)
+        {
+            await GroupService.Delete(id);
+            groups = await GroupService.GetAll();
+            StateHasChanged();
+        }
+    }
+
+
+
+}

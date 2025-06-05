@@ -1,0 +1,67 @@
+@page "/groups/show/{Id:int}"
+@using BlazorSuperApp.Models
+@using BlazorSuperApp.Dtos;
+@inject BlazorSuperApp.Services.GroupService GroupService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Details groupe</PageTitle>
+
+@if (groupDto == null)
+{
+    <p><em>Récupération des informations...</em></p>
+}
+else
+{
+    <h1>@groupDto.Name</h1>
+
+    @if (!groupDto.Medias.Any())
+    {
+        <p><em>Aucun média trouvé.</em></p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var media in groupDto.Medias)
+            {
+                <div class="col-4 card">
+                    <div class="card-header">
+                        <a href="@GetMediaUrl(media.Path)" target="_blank">
+                            <img src="@GetMediaUrl(media.Path)" alt="@GetMediaUrl(media.Path)" class="img-thumbnail" />
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">@media.Name</h5>
+                        <p>Status : <b>@media.Status</b></p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
+
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private GroupDto? groupDto = new();
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            groupDto = await GroupService.GetById(Id);
+            StateHasChanged();
+        }
+    }
+
+
+    private string GetMediaUrl(string? mediaPath)
+    {
+        if (mediaPath == null) return "https://webemps.com/images/default-image.jpg";
+
+        return $"http://localhost:5178/{mediaPath.TrimStart('/')}";
+    }
+
+
+}

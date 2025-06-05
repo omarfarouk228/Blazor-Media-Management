@@ -1,0 +1,111 @@
+@page "/medias/edit/{Id:int}"
+@using BlazorSuperApp.Dtos
+@using BlazorSuperApp.Models
+@inject BlazorSuperApp.Services.MediaService MediaService
+@inject BlazorSuperApp.Services.GroupService GroupService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Editer un média</PageTitle>
+
+<h1>Editer un média</h1>
+
+<EditForm Model="media" OnValidSubmit="UpdateValidSubmit" FormName="updateMediaForm">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="name">Nom</label>
+        <InputText id="name" class="form-control" @bind-Value="media.Name" placeholder="Media 3" />
+        <ValidationMessage For="@(() => media.Name)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="groupId">Groupe</label>
+        <InputSelect id="groupId" class="form-select" @bind-Value="media.GroupID">
+            <option value="">-- Choisir un groupe --</option>
+            @foreach (var group in groups)
+            {
+                <option value="@group.ID">@group.Name</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => media.GroupID)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="type">Type</label>
+        <InputSelect id="type" class="form-select" @bind-Value="media.Type">
+            <option value="">-- Choisir un type --</option>
+            <option value="Image">Image</option>
+            <option value="Video">Video</option>
+            <option value="Audio">Audio</option>
+            <option value="Document">Document</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => media.Type)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="file">Fichier</label>
+        <InputFile id="file" class="form-control" OnChange="HandleFileSelected" />
+    </div>
+    @if (previewUrl != null)
+    {
+        <div class="mb-3">
+            <img src="@previewUrl" alt="@previewUrl" class="img-size" />
+        </div>
+    }
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">Modifier</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private MediaEditModel media = new();
+
+    private List<GroupDto> groups = [];
+
+    private IBrowserFile? selectedFile;
+
+    private string? previewUrl;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            MediaDto? mediaDto = await MediaService.GetById(Id);
+            if (mediaDto != null)
+            {
+                media.Id = mediaDto.ID;
+                media.Name = mediaDto.Name;
+                media.Status = mediaDto.Status;
+                media.Type = mediaDto.Type;
+
+                previewUrl = GetMediaUrl(mediaDto.Path);
+
+                groups = await GroupService.GetAll();
+                media.GroupID = mediaDto.GroupID;
+            }
+            StateHasChanged();
+        }
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    private async Task UpdateValidSubmit()
+    {
+        await MediaService.Update(Id, media, selectedFile);
+        NavigationManager.NavigateTo("/medias");
+    }
+
+    private string GetMediaUrl(string? mediaPath)
+    {
+        if (mediaPath == null) return "https://webemps.com/images/default-image.jpg";
+
+        return $"http://localhost:5178/{mediaPath.TrimStart('/')}";
+    }
+}
