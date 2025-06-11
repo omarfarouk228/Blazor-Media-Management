@@ -1,0 +1,48 @@
+@page "/my-treeview"
+@using BlazorSuperApp.Models
+
+<PageTitle>Mon TreeView Simple</PageTitle>
+
+<h1>Démonstration du TreeView Simple</h1>
+
+<SimpleTreeView RootNodes="sampleTreeData" />
+
+@code {
+    private List<TreeNode> sampleTreeData = new();
+
+    protected override void OnInitialized()
+    {
+        // Créer des données d'exemple pour l'arbre
+        sampleTreeData = new List<TreeNode>
+{
+new TreeNode
+{
+Text = "Élément Racine 1",
+Children = new List<TreeNode>
+{
+new TreeNode { Text = "Enfant 1.1" },
+new TreeNode
+{
+Text = "Enfant 1.2 avec sous-enfants",
+Children = new List<TreeNode>
+{
+new TreeNode { Text = "Sous-enfant 1.2.1" },
+new TreeNode { Text = "Sous-enfant 1.2.2" }
+}
+}
+}
+},
+new TreeNode
+{
+Text = "Élément Racine 2",
+IsExpanded = true, // Cet élément sera déplié par défaut
+Children = new List<TreeNode>
+{
+new TreeNode { Text = "Enfant 2.1" },
+new TreeNode { Text = "Enfant 2.2" }
+}
+},
+new TreeNode { Text = "Élément Racine 3 (sans enfants)" }
+};
+    }
+}

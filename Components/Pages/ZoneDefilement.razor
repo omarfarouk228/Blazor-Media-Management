@@ -1,0 +1,73 @@
+@page "/scrollable"
+@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+
+<h2>Zone de défilement enrichie</h2>
+
+<div class="scroll-container" @ref="scrollDiv">
+    @foreach (var item in messages)
+    {
+        <div class="message">@item</div>
+    }
+</div>
+
+<div class="form-inline">
+    <input @bind="newMessage" placeholder="Entrez un message" />
+    <button @onclick="AddMessage">Ajouter</button>
+</div>
+
+<style>
+    .scroll-container {
+        height: 300px;
+        overflow-y: auto;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;
+        background: #f9f9f9;
+        scroll-behavior: smooth;
+    }
+
+    .scroll-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .scroll-container::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 4px;
+    }
+
+    .message {
+        padding: 8px;
+        margin-bottom: 6px;
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        border-radius: 5px;
+        font-family: Arial;
+    }
+
+    .form-inline {
+        margin-top: 10px;
+    }
+
+    input {
+        padding: 5px;
+        margin-right: 5px;
+    }
+</style>
+
+@code {
+    private List<string> messages = new();
+    private string? newMessage;
+    private ElementReference scrollDiv;
+
+    private async Task AddMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(newMessage))
+        {
+            messages.Add(newMessage);
+            newMessage = string.Empty;
+            await JS.InvokeVoidAsync("scrollToBottom", scrollDiv);
+        }
+    }
+}

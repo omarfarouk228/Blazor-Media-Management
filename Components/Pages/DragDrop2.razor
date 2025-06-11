@@ -1,0 +1,250 @@
+@* @page "/dragdrop2"
+@inject ILogger<DragDrop2> Logger
+@rendermode InteractiveServer
+
+<h3>Démo Drag & Drop Bidirectionnelle</h3>
+
+<div style="display: flex; gap: 30px; margin-top: 20px; font-family: Arial, sans-serif;">
+    <!-- Liste A -->
+    <div>
+        <h4 style="color: #2c5aa0; margin-bottom: 10px;">📋 Liste A (@ListA.Count éléments)</h4>
+        <div class="drop-zone" @ondrop="() => OnDrop('A')" @ondragover="OnDragOver" @ondragover:preventDefault="true"
+            @ondragenter="() => OnDragEnter('A')" @ondragleave="() => OnDragLeave('A')">
+            @foreach (var item in ListA)
+            {
+                <div class="draggable-item list-a-item" draggable="true" @ondragstart="() => OnDragStart(item, 'A')">
+                    <span class="drag-handle">⋮⋮</span>
+                    @item
+                </div>
+            }
+            @if (!ListA.Any())
+            {
+                <div class="empty-message">Zone vide - Déposez des éléments ici</div>
+            }
+        </div>
+    </div>
+
+    <!-- Flèches indicatives -->
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; color: #666;">
+        <div style="font-size: 24px; margin: 5px;">⇄</div>
+        <div style="font-size: 12px; text-align: center;">Glissez dans<br />les deux sens</div>
+    </div>
+
+    <!-- Liste B -->
+    <div>
+        <h4 style="color: #28a745; margin-bottom: 10px;">📋 Liste B (@ListB.Count éléments)</h4>
+        <div class="drop-zone" @ondrop="() => OnDrop('B')" @ondragover="OnDragOver" @ondragover:preventDefault="true"
+            @ondragenter="() => OnDragEnter('B')" @ondragleave="() => OnDragLeave('B')">
+            @foreach (var item in ListB)
+            {
+                <div class="draggable-item list-b-item" draggable="true" @ondragstart="() => OnDragStart(item, 'B')">
+                    <span class="drag-handle">⋮⋮</span>
+                    @item
+                </div>
+            }
+            @if (!ListB.Any())
+            {
+                <div class="empty-message">Zone vide - Déposez des éléments ici</div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Informations de debug -->
+<div style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 5px; font-size: 12px;">
+    <strong>Debug Info:</strong><br />
+    Élément en cours de déplacement: <span style="color: #dc3545;">@(draggedItem ?? "Aucun")</span><br />
+    Source: <span style="color: #6c757d;">@(draggedSource ?? "Aucune")</span><br />
+    Zone de survol: <span style="color: #28a745;">@(currentDropZone ?? "Aucune")</span>
+</div>
+
+<style>
+    .drop-zone {
+        border: 2px dashed #ccc;
+        padding: 15px;
+        min-height: 200px;
+        width: 250px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        background-color: #fafafa;
+    }
+
+    .drop-zone.drag-over {
+        border-color: #007bff;
+        background-color: #e3f2fd;
+        transform: scale(1.02);
+    }
+
+    .draggable-item {
+        padding: 8px 12px;
+        margin: 5px 0;
+        border-radius: 5px;
+        cursor: move;
+        user-select: none;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .draggable-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .list-a-item {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .list-b-item {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .drag-handle {
+        margin-right: 8px;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: bold;
+    }
+
+    .empty-message {
+        color: #999;
+        font-style: italic;
+        text-align: center;
+        padding: 40px 10px;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+    }
+
+    .draggable-item.dragging {
+        opacity: 0.5;
+        transform: rotate(5deg);
+    }
+</style>
+
+@code {
+    private List<string> ListA = ["📄 Document 1", "📊 Rapport 2", "📈 Analyse 3", "📋 Liste 4"];
+    private List<string> ListB = ["🎯 Objectif A", "⚡ Action B"];
+    private string? draggedItem;
+    private string? draggedSource;
+    private string? currentDropZone;
+
+    private void OnDragStart(string item, string sourceList)
+    {
+        draggedItem = item;
+        draggedSource = sourceList;
+        Logger.LogInformation($"🎯 Début du glissement: '{item}' depuis Liste {sourceList}");
+        StateHasChanged();
+    }
+
+    private void OnDragOver(DragEventArgs e)
+    {
+        e.PreventDefault();
+    }
+
+    private void OnDragEnter(string targetList)
+    {
+        currentDropZone = targetList;
+        StateHasChanged();
+    }
+
+    private void OnDragLeave(string targetList)
+    {
+        // Petite temporisation pour éviter le scintillement
+        Task.Delay(100).ContinueWith(_ =>
+        {
+            if (currentDropZone == targetList)
+            {
+                currentDropZone = null;
+                InvokeAsync(StateHasChanged);
+            }
+        });
+    }
+
+    private void OnDrop(string targetList)
+    {
+        Logger.LogInformation($"🎯 Tentative de dépôt dans Liste {targetList}");
+
+        if (string.IsNullOrEmpty(draggedItem) || string.IsNullOrEmpty(draggedSource))
+        {
+            Logger.LogWarning("❌ Données de glissement manquantes");
+            ResetDragState();
+            return;
+        }
+
+        // Éviter de déposer dans la même liste
+        if (draggedSource == targetList)
+        {
+            Logger.LogInformation($"💡 Élément déjà dans Liste {targetList}, pas de déplacement nécessaire");
+            ResetDragState();
+            return;
+        }
+
+        // Effectuer le transfert
+        bool success = TransferItem(draggedItem, draggedSource, targetList);
+
+        if (success)
+        {
+            Logger.LogInformation($"✅ Déplacement réussi: '{draggedItem}' de Liste {draggedSource} vers Liste {targetList}");
+        }
+        else
+        {
+            Logger.LogError($"❌ Échec du déplacement de '{draggedItem}'");
+        }
+
+        ResetDragState();
+        StateHasChanged();
+    }
+
+    private bool TransferItem(string item, string sourceList, string targetList)
+    {
+        try
+        {
+            // Retirer de la liste source
+            bool removed = sourceList switch
+            {
+                "A" => ListA.Remove(item),
+                "B" => ListB.Remove(item),
+                _ => false
+            };
+
+            if (!removed)
+            {
+                Logger.LogWarning($"⚠️ Impossible de retirer '{item}' de Liste {sourceList}");
+                return false;
+            }
+
+            // Ajouter à la liste cible
+            switch (targetList)
+            {
+                case "A":
+                    ListA.Add(item);
+                    break;
+                case "B":
+                    ListB.Add(item);
+                    break;
+                default:
+                    Logger.LogError($"❌ Liste cible inconnue: {targetList}");
+                    // Remettre l'élément dans la source en cas d'erreur
+                    if (sourceList == "A") ListA.Add(item);
+                    else if (sourceList == "B") ListB.Add(item);
+                    return false;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"❌ Erreur lors du transfert de '{item}'");
+            return false;
+        }
+    }
+
+    private void ResetDragState()
+    {
+        draggedItem = null;
+        draggedSource = null;
+        currentDropZone = null;
+    }
+} *@

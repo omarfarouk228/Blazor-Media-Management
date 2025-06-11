@@ -1,0 +1,23 @@
+@using BlazorSuperApp.Models
+@rendermode InteractiveServer
+
+<h3>Mon Arbre Simple</h3>
+
+@if (RootNodes == null || !RootNodes.Any())
+{
+    <p><em>Aucune donnée à afficher dans l'arbre.</em></p>
+}
+else
+{
+    <ul style="padding-left: 0;">
+        @foreach (var rootNode in RootNodes)
+        {
+            <TreeNodeDisplay Node="rootNode" Level="0" />
+        }
+    </ul>
+}
+
+@code {
+    [Parameter]
+    public List<TreeNode>? RootNodes { get; set; }
+}

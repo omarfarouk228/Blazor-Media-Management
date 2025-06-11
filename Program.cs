@@ -1,11 +1,8 @@
-using System.Net.Http.Headers;
-using System.Text.RegularExpressions;
 using Blazored.LocalStorage;
 using BlazorSuperApp;
 using BlazorSuperApp.Components;
 using BlazorSuperApp.Handlers;
 using BlazorSuperApp.Services;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +15,8 @@ builder.Services.AddScoped<CookieService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddTransient<AuthHeaderHandler>();
 
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication();
+// builder.Services.AddAuthorization();
+// builder.Services.AddAuthentication();
 
 
 builder.Services.AddHttpClient<GroupService>(client =>
@@ -38,12 +35,6 @@ builder.Services.AddHttpClient<AuthService>(client =>
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 
-
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-});
 
 // Add scoped services
 // builder.Services.AddScoped<GroupService>(sp =>
@@ -71,14 +62,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseSession();
+// app.UseSession();
 
 
 app.UseHttpsRedirection();
 
 
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 app.UseAntiforgery();
 

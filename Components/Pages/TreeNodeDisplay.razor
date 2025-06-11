@@ -1,0 +1,42 @@
+@using BlazorSuperApp.Models
+
+<li style="list-style-type: none;">
+    <div @onclick="ToggleExpand"
+        style="cursor: pointer; display: flex; align-items: center; padding-left: @(Level * 20)px;">
+        @if (Node.Children.Any())
+        {
+            <span class="fa @(Node.IsExpanded ? "fa-caret-down" : "fa-caret-right")" style="width: 20px;"></span>
+        }
+        else
+        {
+            <span style="width: 20px;"></span> @* Espace pour aligner avec les icônes de dossier *@
+        }
+        <span class="fa fa-file" style="margin-right: 5px;"></span> @* Icône simple, vous pouvez la rendre dynamique *@
+        @Node.Text
+    </div>
+
+    @if (Node.IsExpanded && Node.Children.Any())
+    {
+        <ul style="padding-left: 0; margin-bottom: 0;">
+            @foreach (var childNode in Node.Children)
+            {
+                <TreeNodeDisplay Node="childNode" Level="Level + 1" />
+            }
+        </ul>
+    }
+</li>
+
+@code {
+    [Parameter]
+    public TreeNode Node { get; set; } = null!;
+
+    [Parameter]
+    public int Level { get; set; } = 0;
+
+    private void ToggleExpand()
+    {
+        Node.IsExpanded = !Node.IsExpanded;
+        // StateHasChanged() sera appelé automatiquement par le framework
+        // car le composant parent (SimpleTreeView) sera en mode interactif.
+    }
+}

@@ -1,0 +1,68 @@
+@inject IJSRuntime JS
+
+<EditForm Model="@userModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalLabel">Créer un utilisateur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Nom</label>
+                        <InputText class="form-control" @bind-Value="userModel.Name" />
+                        <ValidationMessage For="@(() => userModel.Name)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <InputText class="form-control" @bind-Value="userModel.Email" />
+                        <ValidationMessage For="@(() => userModel.Email)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Date de naissance</label>
+                        <InputDate class="form-control" @bind-Value="userModel.BirthDate" />
+                        <ValidationMessage For="@(() => userModel.BirthDate)" />
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private UserModel userModel = new();
+
+    private async Task HandleValidSubmit()
+    {
+        // Simule une sauvegarde
+        await JS.InvokeVoidAsync("hideBootstrapModal", "userModal");
+
+        // Réinitialise le formulaire
+        userModel = new();
+    }
+}
+
+@code {
+    public class UserModel
+    {
+
+        public string? Name { get; set; }
+
+
+        public string? Email { get; set; }
+
+        public DateTime? BirthDate { get; set; }
+    }
+}

@@ -1,0 +1,92 @@
+@page "/dragdrop"
+@inject ILogger<DragDrop> Logger
+@rendermode InteractiveServer
+
+
+<h2>Démo Drag & Drop enrichie</h2>
+
+<div class="container">
+    <div class="column">
+        <h3>Liste A</h3>
+        @foreach (var item in ListA)
+        {
+            <div class="item" draggable="true" @ondragstart="() => OnDragStart(item)">
+                @item
+            </div>
+        }
+    </div>
+
+    <div class="column" @ondragover="OnDragOver" @ondrop="OnDrop" @ondragover:preventDefault>
+        <h3>Liste B</h3>
+        @foreach (var item in ListB)
+        {
+            <div class="item">@item</div>
+        }
+        @if (!ListB.Any())
+        {
+            <div style="color: #999; font-style: italic;">Déposez les éléments ici</div>
+        }
+    </div>
+</div>
+
+<style>
+    .container {
+        display: flex;
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    .column {
+        width: 200px;
+        min-height: 250px;
+        padding: 15px;
+        background-color: #f1f1f1;
+        border-radius: 8px;
+        border: 2px dashed #bbb;
+    }
+
+    .item {
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #cce5ff;
+        border: 1px solid #b8daff;
+        border-radius: 5px;
+        cursor: grab;
+    }
+</style>
+
+@code {
+    private List<string> ListA = ["Article 1", "Article 2", "Article 3"];
+    private List<string> ListB = [];
+    private string? draggedItem;
+
+    private void OnDragStart(string item)
+    {
+        draggedItem = item;
+        Logger.LogInformation($"OnDragStart: {item}");
+    }
+
+    private void OnDragOver(DragEventArgs e)
+    {
+        // Nécessaire pour autoriser le drop
+        // e.PreventDefault();
+    }
+
+    private void OnDrop(DragEventArgs e)
+    {
+        Logger.LogInformation("OnDrop triggered.");
+        if (!string.IsNullOrEmpty(draggedItem))
+        {
+            Logger.LogInformation($"Dropping: {draggedItem}");
+            ListA.Remove(draggedItem);
+            ListB.Add(draggedItem);
+            draggedItem = null;
+
+            StateHasChanged();
+        }
+        else
+        {
+            Logger.LogWarning("draggedItem is null or empty.");
+        }
+    }
+}
