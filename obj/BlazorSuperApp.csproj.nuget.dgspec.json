@@ -44,9 +44,29 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "Blazor.Bootstrap": {
+              "target": "Package",
+              "version": "[3.3.1, )"
+            },
             "Blazored.LocalStorage": {
               "target": "Package",
               "version": "[4.5.0, )"
+            },
+            "Moq": {
+              "target": "Package",
+              "version": "[4.20.72, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
+            "bunit": {
+              "target": "Package",
+              "version": "[1.39.5, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.9.3, )"
             }
           },
           "imports": [

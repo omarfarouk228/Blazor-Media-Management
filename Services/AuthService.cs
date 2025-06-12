@@ -44,5 +44,42 @@ namespace BlazorSuperApp.Services
             return null;
         }
 
+        public async Task<string?> ForgotPassword(ForgotPasswordModel forgotModel)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/api/Auth/forgot-password", forgotModel);
+
+
+            if (!response.IsSuccessStatusCode)
+                return "Erreur serveur. Veuilez réessayer!";
+
+            var result = await response.Content.ReadFromJsonAsync<AuthResult>();
+
+            if (result is null || !result.IsSuccess || string.IsNullOrWhiteSpace(result.Token))
+            {
+                return result?.Message ?? "Échec de la connexion";
+            }
+
+            return null;
+        }
+
+        public async Task<string?> ResetPassword(ResetPasswordModel resetPasswordModel)
+        {
+            Console.WriteLine(resetPasswordModel.Token);
+            var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/api/Auth/reset-password", new { resetPasswordModel });
+
+
+            if (!response.IsSuccessStatusCode)
+                return "Erreur serveur. Veuilez réessayer!";
+
+            var result = await response.Content.ReadFromJsonAsync<AuthResult>();
+
+            if (result is null || !result.IsSuccess || string.IsNullOrWhiteSpace(result.Token))
+            {
+                return result?.Message ?? "Échec de la connexion";
+            }
+
+            return null;
+        }
+
     }
 }

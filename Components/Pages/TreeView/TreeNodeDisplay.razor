@@ -1,0 +1,39 @@
+@using BlazorSuperApp.Models
+
+<li style="list-style-type: none;">
+    <div @onclick="ToggleExpand" style="padding-left: @(Level * 20)px;">
+        @if(TreeNode.Children.Count > 0){
+        <span class="fa @(TreeNode.IsExpanded ? "fa-caret-down" : "fa-caret-right")" style="width: 20px;"></span>
+        }
+        else{
+            <span style="width: 20px;"></span>
+        }
+
+        <span class="fa fa-file mr-2"></span>
+        @TreeNode.Text
+    </div>
+
+    @if (TreeNode.IsExpanded && TreeNode.Children.Count > 0)
+    {
+        <ul style="padding-left: 0;">
+            @foreach (var child in TreeNode.Children)
+            {
+                <TreeNodeDisplay TreeNode="child" Level="Level + 1" />
+            }
+        </ul>
+    }
+
+</li>
+
+@code {
+    [Parameter]
+    public TreeNode TreeNode { get; set; }
+
+    [Parameter]
+    public int Level { get; set; } = 0;
+
+    private void ToggleExpand()
+    {
+        TreeNode.IsExpanded = !TreeNode.IsExpanded;
+    }
+}

@@ -28,6 +28,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9FcnJvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/theessential/Documents/BlazorProject/BlazorSuperApp/Components/Pages/ForgotPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Gb3Jnb3RQYXNzd29yZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/theessential/Documents/BlazorProject/BlazorSuperApp/Components/Pages/Group/Create.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Hcm91cC9DcmVhdGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -62,6 +66,18 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/Users/theessential/Documents/BlazorProject/BlazorSuperApp/Components/Pages/Media/Index.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9NZWRpYS9JbmRleC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/theessential/Documents/BlazorProject/BlazorSuperApp/Components/Pages/ResetPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9SZXNldFBhc3N3b3JkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/theessential/Documents/BlazorProject/BlazorSuperApp/Components/Pages/TreeView/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9UcmVlVmlldy9JbmRleC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/theessential/Documents/BlazorProject/BlazorSuperApp/Components/Pages/TreeView/TreeNodeDisplay.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9UcmVlVmlldy9UcmVlTm9kZURpc3BsYXkucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/theessential/Documents/BlazorProject/BlazorSuperApp/Components/Routes.razor]

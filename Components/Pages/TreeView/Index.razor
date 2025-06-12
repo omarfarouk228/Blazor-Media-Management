@@ -1,0 +1,81 @@
+@page "/treeview"
+@using BlazorSuperApp.Models
+<PageTitle>TreeView</PageTitle>
+@rendermode InteractiveServer
+
+<h1>TreeView</h1>
+
+@if (treeData.Count > 0)
+{
+    <ul style="padding-left: 0;">
+        @foreach (var node in treeData)
+        {
+            <TreeNodeDisplay TreeNode="node" Level="0" />
+        }
+    </ul>
+}
+else
+{
+    <p><em>Aucune donnée à afficher dans l'arbre.</em></p>
+}
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
+<Modal @ref="modal" Title="Modal title">
+    <BodyTemplate>
+        Modal body text goes here.
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Close</Button>
+        <Button Color="ButtonColor.Primary">Save changes</Button>
+    </FooterTemplate>
+</Modal>
+
+<Button Color="ButtonColor.Primary" @onclick="OnShowModalClick">Show Modal</Button>
+
+@code {
+    private List<TreeNode> treeData = new();
+
+    List<ToastMessage> messages = new List<ToastMessage>();
+
+    private Modal modal = default!;
+
+    private async Task OnShowModalClick()
+    {
+        messages.Add(new ToastMessage
+        {
+            Type = ToastType.Primary,
+            Title = "Blazor Bootstrap",
+            HelpText = $"{DateTime.Now}",
+            Message = $"Hello, world! This is a toast message. DateTime: {DateTime.Now}",
+        });
+        await modal.ShowAsync();
+    }
+
+    private async Task OnHideModalClick()
+    {
+        await modal.HideAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        treeData = new List<TreeNode>{
+new TreeNode{Text = "Noeud 1", IsExpanded = true , Children = new List<TreeNode>{
+new TreeNode{Text = "Noeud 1.1"},
+new TreeNode{Text = "Noeud 1.2"},
+new TreeNode{Text = "Noeud 1.3"},
+}},
+new TreeNode{Text = "Noeud 2"},
+new TreeNode{Text = "Noeud 3"},
+new TreeNode{Text = "Noeud 4", Children = new List<TreeNode>{
+new TreeNode{Text = "Noeud 4.1", Children = new List<TreeNode>{
+new TreeNode{Text = "Noeud 4.1.1"},
+new TreeNode{Text = "Noeud 4.1.2"},
+new TreeNode{Text = "Noeud 4.1.3"},
+}},
+new TreeNode{Text = "Noeud 4.2"},
+new TreeNode{Text = "Noeud 4.3"},
+}},
+};
+    }
+}

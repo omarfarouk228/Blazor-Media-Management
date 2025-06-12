@@ -14,12 +14,12 @@ builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSet
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddBlazoredLocalStorage();
+
 builder.Services.AddScoped<CookieService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddTransient<AuthHeaderHandler>();
 
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication();
+
 
 
 builder.Services.AddHttpClient<GroupService>(client =>
@@ -59,6 +59,8 @@ builder.Services.AddSession(options =>
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddBlazorBootstrap();
+
 
 
 var app = builder.Build();
@@ -76,9 +78,6 @@ app.UseSession();
 
 app.UseHttpsRedirection();
 
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.UseAntiforgery();
 
