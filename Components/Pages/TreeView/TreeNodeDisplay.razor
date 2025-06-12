@@ -1,39 +1,90 @@
 @using BlazorSuperApp.Models
+@using BlazorSuperApp.Dtos;
+@inject BlazorSuperApp.Services.FolderService FolderService
+@inject BlazorSuperApp.Services.FileService FileService
 
 <li style="list-style-type: none;">
     <div @onclick="ToggleExpand" style="padding-left: @(Level * 20)px;">
-        @if(TreeNode.Children.Count > 0){
-        <span class="fa @(TreeNode.IsExpanded ? "fa-caret-down" : "fa-caret-right")" style="width: 20px;"></span>
+        @if (TreeNode.HasFiles || HasChildren)
+        {
+            <span class="fa @(TreeNode.IsExpanded ? "fa-caret-down" : "fa-caret-right")" style="width: 20px;"></span>
         }
-        else{
+        else
+        {
             <span style="width: 20px;"></span>
         }
 
-        <span class="fa fa-file mr-2"></span>
-        @TreeNode.Text
+        <span class="fa fa-folder mr-2"></span>
+        @TreeNode.Name
     </div>
 
-    @if (TreeNode.IsExpanded && TreeNode.Children.Count > 0)
+    @if (TreeNode.IsExpanded)
     {
-        <ul style="padding-left: 0;">
-            @foreach (var child in TreeNode.Children)
-            {
-                <TreeNodeDisplay TreeNode="child" Level="Level + 1" />
-            }
-        </ul>
+        @if (HasChildren)
+        {
+            <ul style="padding-left: 0;">
+                @foreach (var child in TreeNode.SubFolders)
+                {
+                    <TreeNodeDisplay TreeNode="child" Level="Level + 1" />
+                }
+            </ul>
+        }
+
+        @if (TreeNode.Files.Any())
+        {
+            <ul style="padding-left: @((Level + 1) * 20)px;">
+                @foreach (var file in TreeNode.Files)
+                {
+                    <li style="list-style-type: none;">
+                        <span class="fa fa-file mr-2"></span>
+                        @file.Name
+                    </li>
+                }
+            </ul>
+        }
+
+
     }
 
 </li>
 
 @code {
     [Parameter]
-    public TreeNode TreeNode { get; set; }
+    public FolderDto TreeNode { get; set; }
 
     [Parameter]
     public int Level { get; set; } = 0;
 
-    private void ToggleExpand()
+    private bool HasChildren => TreeNode.SubFolders.Any() == true;
+    private bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
     {
+        TreeNode.HasFiles = await FolderService.HasFiles(TreeNode.Id);
+    }
+
+    private async void ToggleExpand()
+    {
+        if (!TreeNode.IsExpanded)
+        {
+            isLoading = true;
+
+            // Charger les sous-dossiers
+            if (TreeNode.SubFolders.Any() == false)
+            {
+                TreeNode.SubFolders = await FolderService.GetChildrens(TreeNode.Id);
+            }
+
+            // Charges les fichiers
+            if (TreeNode.HasFiles && TreeNode.Files.Any() == false)
+            {
+                TreeNode.Files = await FileService.GetByFolder(TreeNode.Id);
+            }
+
+            isLoading = false;
+        }
         TreeNode.IsExpanded = !TreeNode.IsExpanded;
+
+        StateHasChanged();
     }
 }

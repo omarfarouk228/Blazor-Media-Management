@@ -19,8 +19,6 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddTransient<AuthHeaderHandler>();
 
 
-
-
 builder.Services.AddHttpClient<GroupService>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
@@ -28,6 +26,16 @@ builder.Services.AddHttpClient<GroupService>(client =>
 }).AddHttpMessageHandler<AuthHeaderHandler>();
 
 builder.Services.AddHttpClient<MediaService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+}).AddHttpMessageHandler<AuthHeaderHandler>();
+
+builder.Services.AddHttpClient<FolderService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+}).AddHttpMessageHandler<AuthHeaderHandler>();
+
+builder.Services.AddHttpClient<FileService>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
 }).AddHttpMessageHandler<AuthHeaderHandler>();
