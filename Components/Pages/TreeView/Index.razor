@@ -19,36 +19,15 @@ else
     <p><em>Aucune donnée à afficher dans l'arbre.</em></p>
 }
 
-<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
-
-<Modal @ref="modal" Title="Modal title">
-    <BodyTemplate>
-        Modal body text goes here.
-    </BodyTemplate>
-    <FooterTemplate>
-        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Close</Button>
-        <Button Color="ButtonColor.Primary">Save changes</Button>
-    </FooterTemplate>
-</Modal>
-
-<Button Color="ButtonColor.Primary" @onclick="OnShowModalClick">Show Modal</Button>
 
 @code {
     private List<TreeNode> treeData = new();
 
-    List<ToastMessage> messages = new List<ToastMessage>();
-
-    private Modal modal = default!;
+ 
 
     private async Task OnShowModalClick()
     {
-        messages.Add(new ToastMessage
-        {
-            Type = ToastType.Primary,
-            Title = "Blazor Bootstrap",
-            HelpText = $"{DateTime.Now}",
-            Message = $"Hello, world! This is a toast message. DateTime: {DateTime.Now}",
-        });
+      
         await modal.ShowAsync();
     }
 

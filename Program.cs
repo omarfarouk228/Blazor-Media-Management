@@ -14,7 +14,6 @@ builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSet
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddBlazoredLocalStorage();
-
 builder.Services.AddScoped<CookieService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddTransient<AuthHeaderHandler>();
@@ -58,8 +57,6 @@ builder.Services.AddSession(options =>
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
-builder.Services.AddBlazorBootstrap();
 
 
 
