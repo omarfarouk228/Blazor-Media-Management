@@ -3,9 +3,12 @@
 @inject BlazorSuperApp.Services.FolderService FolderService
 @inject BlazorSuperApp.Services.FileService FileService
 
+<ConfirmDialog @ref="dialog" />
+<Modal @ref="modal" />
+
 <li style="list-style-type: none;">
     <div @onclick="ToggleExpand" style="padding-left: @(Level * 20)px;">
-        @if (TreeNode.HasFiles || HasChildren)
+        @if (TreeNode.HasFiles || TreeNode.HasChildrens)
         {
             <span class="fa @(TreeNode.IsExpanded ? "fa-caret-down" : "fa-caret-right")" style="width: 20px;"></span>
         }
@@ -16,16 +19,25 @@
 
         <span class="fa fa-folder mr-2"></span>
         @TreeNode.Name
+
+        <Button Color="ButtonColor.Success" @onclick="ShowEditModalAsync" Size="ButtonSize.Small" Class="p-0 px-1">
+            <Icon Name="IconName.Pencil" />
+        </Button>
+
+        <Button Color="ButtonColor.Danger" @onclick="ShowConfirmationAsync" Size="ButtonSize.Small" Class="p-0 px-1">
+            <Icon Name="IconName.Trash" />
+        </Button>
+
     </div>
 
     @if (TreeNode.IsExpanded)
     {
-        @if (HasChildren)
+        @if (TreeNode.HasChildrens)
         {
             <ul style="padding-left: 0;">
                 @foreach (var child in TreeNode.SubFolders)
                 {
-                    <TreeNodeDisplay TreeNode="child" Level="Level + 1" />
+                    <TreeNodeDisplay TreeNode="child" Level="Level + 1" OnDeleted="HandleSubFolderDeleted" />
                 }
             </ul>
         }
@@ -55,12 +67,19 @@
     [Parameter]
     public int Level { get; set; } = 0;
 
-    private bool HasChildren => TreeNode.SubFolders.Any() == true;
+    [Parameter]
+    public EventCallback OnDeleted { get; set; }
+
     private bool isLoading = false;
+
+    private ConfirmDialog dialog;
+
+    private Modal modal = default!;
 
     protected override async Task OnInitializedAsync()
     {
         TreeNode.HasFiles = await FolderService.HasFiles(TreeNode.Id);
+        TreeNode.HasChildrens = await FolderService.HasChildrens(TreeNode.Id);
     }
 
     private async void ToggleExpand()
@@ -87,4 +106,42 @@
 
         StateHasChanged();
     }
+
+    private async Task ShowConfirmationAsync()
+    {
+        var confirmation = await dialog.ShowAsync(
+        title: "Suppression de dossier?",
+        message1: "Êtes-vous sûr de supprimer ce dossier et tout son contenu?");
+
+        if (confirmation)
+        {
+            await FolderService.Delete(TreeNode.Id);
+            await OnDeleted.InvokeAsync();
+        }
+        else
+        {
+
+        }
+
+    }
+    private async Task HandleSubFolderDeleted()
+    {
+        TreeNode.HasChildrens = await FolderService.HasChildrens(TreeNode.Id);
+        TreeNode.SubFolders = await FolderService.GetChildrens(TreeNode.Id);
+        StateHasChanged();
+    }
+
+    private async Task ShowEditModalAsync()
+    {
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("folderDto", TreeNode);
+        parameters.Add("onUpdated", EventCallback.Factory.Create<MouseEventArgs>(this, HandleUpdate));
+        await modal.ShowAsync<EditFolder>(title: "Editer un dossier", parameters: parameters);
+    }
+
+    private async Task HandleUpdate(MouseEventArgs args)
+    {
+        await modal.HideAsync();
+    }
+
 }

@@ -22,8 +22,7 @@
     </div>
     <div class="mb-3">
         <label for="password">Password</label>
-        <InputText type="password" id="password" class="form-control" @bind-Value="loginModel.Password"
-            placeholder="*******" />
+        <PasswordInput id="password" class="form-control" @bind-Value="loginModel.Password" placeholder="*******" />
         <ValidationMessage For="@(() => loginModel.Password)" />
     </div>
 

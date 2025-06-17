@@ -17,7 +17,7 @@ else if (treeData.Count > 0)
     <ul style="padding-left: 0;">
         @foreach (var node in treeData)
         {
-            <TreeNodeDisplay TreeNode="node" Level="0" />
+            <TreeNodeDisplay TreeNode="node" Level="0" OnDeleted="HandleFolderDeleted" />
         }
     </ul>
 }
@@ -34,9 +34,23 @@ else
     {
         if (firstRender)
         {
-            treeData = await FolderService.GetAll();
-            isLoading = false;
-            StateHasChanged();
+            await LoadData();
         }
     }
+
+    private async Task HandleFolderDeleted()
+    {
+        isLoading = true;
+        StateHasChanged();
+        LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        treeData = await FolderService.GetAll();
+        isLoading = false;
+        StateHasChanged();
+    }
+
+
 }

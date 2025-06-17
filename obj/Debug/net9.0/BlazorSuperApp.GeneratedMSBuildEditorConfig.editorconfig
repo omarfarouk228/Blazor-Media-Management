@@ -72,6 +72,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9SZXNldFBhc3N3b3JkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/theessential/Documents/BlazorProject/BlazorSuperApp/Components/Pages/TreeView/EditFolder.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9UcmVlVmlldy9FZGl0Rm9sZGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/theessential/Documents/BlazorProject/BlazorSuperApp/Components/Pages/TreeView/Index.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9UcmVlVmlldy9JbmRleC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 

@@ -47,6 +47,12 @@ namespace BlazorSuperApp.Services
             return await _httpClient.GetFromJsonAsync<bool>($"{_baseUrl}/api/Folder/hasfile/{id}");
         }
 
+        public async Task<bool> HasChildrens(int id)
+        {
+            await Utils.InjectToken(_localStorage, _httpClient);
+            return await _httpClient.GetFromJsonAsync<bool>($"{_baseUrl}/api/Folder/haschildrens/{id}");
+        }
+
         public async Task<bool> Create(FolderFormModel folder)
         {
             await Utils.InjectToken(_localStorage, _httpClient);

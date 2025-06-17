@@ -62,6 +62,8 @@ builder.Services.AddSession(options =>
 //builder.Services.AddScoped<MediaService>();
 //builder.Services.AddScoped<AuthService>();
 
+builder.Services.AddBlazorBootstrap();
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

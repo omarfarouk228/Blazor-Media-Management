@@ -14,6 +14,7 @@ namespace BlazorSuperApp.Dtos
         public List<FileDto> Files { get; set; } = [];
         public bool IsExpanded { get; set; }
         public bool HasFiles { get; set; }
+        public bool HasChildrens { get; set; }
 
     }
 }

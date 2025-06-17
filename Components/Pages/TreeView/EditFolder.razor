@@ -1,0 +1,71 @@
+@using BlazorSuperApp.Models
+@using BlazorSuperApp.Dtos;
+@inject BlazorSuperApp.Services.FolderService FolderService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<EditForm Model="folder" OnValidSubmit="UpdateValidSubmit" FormName="editFolderForm">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="name">Nom</label>
+        <InputText id="name" class="form-control" @bind-Value="folder.Name" placeholder="Dossier 3" />
+        <ValidationMessage For="@(() => folder.Name)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="parentId">Dossier parent</label>
+        <AutoComplete @bind-Value="parentName" TItem="FolderDto" DataProvider="FoldersDataProvider" PropertyName="Name"
+            Placeholder="Chercher un dossier..."
+            OnChanged="(FolderDto searchFolder) => OnAutoCompleteChanged(searchFolder)" />
+        <ValidationMessage For="@(() => folder.ParentId)" />
+    </div>
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">Modifier</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter] public FolderDto folderDto { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> onUpdated { get; set; }
+
+    private FolderEditModel folder = new();
+    private List<FolderDto> allFolders = new();
+
+    private string parentName = "";
+
+    protected override async void OnInitialized()
+    {
+        allFolders = await FolderService.GetAll();
+
+        folder.Id = folderDto.Id;
+        folder.Name = folderDto.Name;
+        folder.ParentId = folderDto.ParentId;
+        parentName = allFolders.FirstOrDefault(folder => folder.Id == folderDto.ParentId)?.Name ?? "";
+
+        StateHasChanged();
+
+        base.OnInitialized();
+    }
+
+    private async Task UpdateValidSubmit()
+    {
+        await FolderService.Update(folderDto.Id, folder);
+        await onUpdated.InvokeAsync();
+    }
+
+    private async Task<AutoCompleteDataProviderResult<FolderDto>>
+    FoldersDataProvider(AutoCompleteDataProviderRequest<FolderDto> request)
+    {
+        return await Task.FromResult(request.ApplyTo(allFolders.OrderBy(folder => folder.Name)));
+    }
+
+    private void OnAutoCompleteChanged(FolderDto searchFolder)
+    {
+        folder.ParentId = searchFolder.Id;
+        StateHasChanged();
+    }
+}
